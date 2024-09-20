@@ -112,6 +112,7 @@ function Asistencia() {
         <form className="mx-auto mb-3 w-100" style={{ maxWidth: "400px" }}>
           <div className="mb-4 row justify-content-center">
             <div className="col-12">
+              <i className="fas fa-calendar-alt fa-lg me-2"></i>
               <label htmlFor="fecha" className="form-label fw-bold">
                 Fecha
               </label>
@@ -127,6 +128,7 @@ function Asistencia() {
 
           <div className="mb-4 row justify-content-center">
             <div className="col-12">
+            <i className="fa-solid fa-users fa-lg me-2"></i>
               <label htmlFor="presencial" className="form-label fw-bold">
                 Presencial
               </label>
@@ -142,6 +144,7 @@ function Asistencia() {
 
           <div className="mb-4 row justify-content-center">
             <div className="col-12">
+            <i className="fas fa-video fa-lg me-2"></i>
               <label htmlFor="zoom" className="form-label fw-bold">
                 Zoom
               </label>
@@ -157,6 +160,7 @@ function Asistencia() {
 
           <div className="mb-4 row justify-content-center">
             <div className="col-12">
+            <i className="fab fa-youtube fa-lg me-2"></i>
               <label htmlFor="youtube" className="form-label fw-bold">
                 YouTube
               </label>
@@ -172,6 +176,7 @@ function Asistencia() {
 
           <div className="mb-4 row justify-content-center">
             <div className="col-12">
+            <i className="fas fa-sticky-note fa-lg me-2"></i>
               <label htmlFor="notas" className="form-label fw-bold">
                 Notas
               </label>
