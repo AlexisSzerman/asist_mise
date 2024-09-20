@@ -7,6 +7,7 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
+import { jsPDF } from "jspdf";
 
 function Asistencia() {
   const [date, setDate] = useState("");
@@ -19,11 +20,15 @@ function Asistencia() {
   const [toastType, setToastType] = useState("");
   const [loading, setLoading] = useState(false);
   const [notas, setNotas] = useState("");
+  const [availableMonths, setAvailableMonths] = useState([]);
+  const [monthFilter, setMonthFilter] = useState(""); 
+
 
   // Estado para mostrar los modales
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+ 
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -32,19 +37,32 @@ function Asistencia() {
           ...doc.data(),
           id: doc.id,
         }));
-
+  
         // Sort by date in descending order
         asistenciasData.sort((a, b) => new Date(b.date) - new Date(a.date));
-
+  
         setHistorial(asistenciasData);
+  
+        // Extraer meses y años únicos de las fechas
+        const uniqueMonthsYears = asistenciasData.reduce((acc, entry) => {
+          const date = new Date(entry.date);
+          const monthYear = `${date.getMonth() + 1}-${date.getFullYear()}`; // "mes-año"
+          if (!acc.includes(monthYear)) {
+            acc.push(monthYear);
+          }
+          return acc;
+        }, []);
+  
+        setAvailableMonths(uniqueMonthsYears);
       } catch (error) {
         console.error("Error al obtener los documentos: ", error);
         showToastMessage("Error al obtener los documentos.", "error");
       }
     };
-
+  
     fetchData();
   }, []);
+  
 
   const handleSubmit = async () => {
     if (!date) {
@@ -103,6 +121,31 @@ function Asistencia() {
     setTimeout(() => {
       setShowToast(false);
     }, 3000);
+  };
+
+  const filteredHistorial = historial.filter((entry) => {
+    if (!monthFilter) return true; // Si no hay filtro, mostrar todo
+    const entryMonth = new Date(entry.date).getMonth() + 1; // Mes del registro
+    return entryMonth === parseInt(monthFilter); // Comparar con el mes seleccionado
+  });
+
+  const handlePrintPDF = () => {
+    const doc = new jsPDF();
+    doc.text("Historial de Asistencia", 10, 10);
+    
+    filteredHistorial.forEach((entry, index) => {
+      doc.text(
+        `${index + 1}. Fecha: ${new Date(entry.date).toLocaleDateString(
+          "es-ES"
+        )}, Presencial: ${entry.presencial}, Zoom: ${entry.zoom}, YouTube: ${
+          entry.youtube
+        }, Notas: ${entry.notas || ""}`,
+        10,
+        20 + index * 10
+      );
+    });
+
+    doc.save("historial_asistencia.pdf");
   };
 
   return (
@@ -257,6 +300,40 @@ function Asistencia() {
               })}
             </tbody>
           </table>
+        </div>
+         {/* Selector de mes */}
+         <div className="mx-auto mb-3 w-100" style={{ maxWidth: "400px" }}> 
+  <div className="col-12">
+    <label htmlFor="monthFilter" className="form-label fw-bold">
+      Filtrar por Mes y Año
+    </label>
+    <select
+      id="monthFilter"
+      className="form-control"
+      value={monthFilter}
+      onChange={(e) => setMonthFilter(e.target.value)}
+    >
+      <option value="">Todos los meses</option>
+      {availableMonths.map((monthYear) => {
+        const [month, year] = monthYear.split("-");
+        return (
+          <option key={monthYear} value={monthYear}>
+            {new Date(year, month - 1).toLocaleDateString("es-ES", {
+              month: "long",
+              year: "numeric",
+            })}
+          </option>
+        );
+      })}
+    </select>
+  </div>
+</div>
+
+
+        <div className="mb-4 text-center">
+          <button className="btn btn-primary px-4" onClick={handlePrintPDF}>
+            Imprimir en PDF
+          </button>
         </div>
 
         {/* Modal para agregar asistencia */}
