@@ -61,56 +61,60 @@ function Estadisticas() {
 
     // Acumulación de datos
     if (dayOfWeek === 0 || dayOfWeek === 6) { // Weekend
-      monthlyWeekendData[month] += entry.total;
+      monthlyWeekendData[month] += entry.total || 0; // Asegurarse de que 'total' no sea undefined
       monthlyWeekendCount[month] += 1;
-      yearlyWeekendData[year] += entry.total;
+      yearlyWeekendData[year] += entry.total || 0;
       yearlyWeekendCount[year] += 1;
     } else { // Weekday
-      monthlyWeekdayData[month] += entry.total;
+      monthlyWeekdayData[month] += entry.total || 0;
       monthlyWeekdayCount[month] += 1;
-      yearlyWeekdayData[year] += entry.total;
+      yearlyWeekdayData[year] += entry.total || 0;
       yearlyWeekdayCount[year] += 1;
     }
   });
 
-  // Calcular promedios
+  // Calcular promedios asegurando que no haya divisiones por cero
   const averageMonthlyWeekdayData = Object.keys(monthlyWeekdayData).reduce((acc, month) => {
-    acc[month] = monthlyWeekdayData[month] / monthlyWeekdayCount[month];
+    acc[month] = monthlyWeekdayCount[month] ? monthlyWeekdayData[month] / monthlyWeekdayCount[month] : 0;
     return acc;
   }, {});
 
   const averageMonthlyWeekendData = Object.keys(monthlyWeekendData).reduce((acc, month) => {
-    acc[month] = monthlyWeekendData[month] / monthlyWeekendCount[month];
+    acc[month] = monthlyWeekendCount[month] ? monthlyWeekendData[month] / monthlyWeekendCount[month] : 0;
     return acc;
   }, {});
 
   const averageYearlyWeekdayData = Object.keys(yearlyWeekdayData).reduce((acc, year) => {
-    acc[year] = yearlyWeekdayData[year] / yearlyWeekdayCount[year];
+    acc[year] = yearlyWeekdayCount[year] ? yearlyWeekdayData[year] / yearlyWeekdayCount[year] : 0;
     return acc;
   }, {});
 
   const averageYearlyWeekendData = Object.keys(yearlyWeekendData).reduce((acc, year) => {
-    acc[year] = yearlyWeekendData[year] / yearlyWeekendCount[year];
+    acc[year] = yearlyWeekendCount[year] ? yearlyWeekendData[year] / yearlyWeekendCount[year] : 0;
     return acc;
   }, {});
 
   // Datos para el gráfico
   const chartData = {
-    labels: Object.keys(averageMonthlyWeekdayData),
+    labels: Object.keys(averageMonthlyWeekdayData), // Meses como etiquetas
     datasets: [
       {
         label: 'Promedio Asistencias Semanales',
         data: Object.values(averageMonthlyWeekdayData),
         fill: false,
         borderColor: 'rgba(75, 192, 192, 1)',
-        tension: 0.1
+        tension: 0.4, // Increased tension for smoother lines
+        pointRadius: 5, // Larger points
+        pointHoverRadius: 7, // Larger hover points
       },
       {
         label: 'Promedio Asistencias Fin de Semana',
         data: Object.values(averageMonthlyWeekendData),
         fill: false,
         borderColor: 'rgba(255, 99, 132, 1)',
-        tension: 0.1
+        tension: 0.4,
+        pointRadius: 5,
+        pointHoverRadius: 7,
       },
       {
         label: 'Promedio Anual Asistencias Semanales',
@@ -130,18 +134,44 @@ function Estadisticas() {
       }
     ]
   };
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top', // Position the legend at the top
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0,0,0,0.7)', // Dark background for tooltips
+      },
+    },
+    scales: {
+      x: {
+        grid: {
+          color: 'rgba(0, 0, 0, 0.1)', // Lighten grid lines
+        },
+      },
+      y: {
+        grid: {
+          color: 'rgba(0, 0, 0, 0.1)',
+        },
+      },
+    },
+  };
 
   return (
     <div className='container my-4'>
       <h3 className="text-center">Estadísticas</h3>
-      <div style={{ width: '80%', maxWidth: '600px', margin: '0 auto' }}>
-        <Line data={chartData} />
+      <div style={{ width: '80%', maxWidth: '600px', height: '400px', margin: '0 auto' }}>
+        <Line data={chartData} options={options} />
       </div>
     </div>
   );
 }
 
 export default Estadisticas;
+
 
 
 

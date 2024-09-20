@@ -107,13 +107,12 @@ function Asistencia() {
 
   return (
     <div className="d-flex flex-column justify-content-center align-items-center">
-      <div className="container">
+      <div className="container px-3">
         <h2 className="my-4 text-center">Asistencia Reuniones</h2>
-        <form className="mx-auto mb-3" style={{ maxWidth: "400px" }}>
-          <div className="mb-4 row justify-content-center align-items-center">
-            <div className="col-12 col-md-8 d-flex align-items-center">
-              <i className="fas fa-calendar-alt fa-lg me-2"></i>
-              <label htmlFor="fecha" className="form-label fw-bold me-2 mb-0">
+        <form className="mx-auto mb-3 w-100" style={{ maxWidth: "400px" }}>
+          <div className="mb-4 row justify-content-center">
+            <div className="col-12">
+              <label htmlFor="fecha" className="form-label fw-bold">
                 Fecha
               </label>
               <input
@@ -122,18 +121,13 @@ function Asistencia() {
                 className="form-control"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                style={{ flexGrow: 1 }}
               />
             </div>
           </div>
 
-          <div className="mb-4 row justify-content-center align-items-center">
-            <div className="col-12 col-md-8 d-flex align-items-center">
-              <i className="fa-solid fa-users fa-lg me-2"></i>
-              <label
-                htmlFor="presencial"
-                className="form-label fw-bold me-2 mb-0"
-              >
+          <div className="mb-4 row justify-content-center">
+            <div className="col-12">
+              <label htmlFor="presencial" className="form-label fw-bold">
                 Presencial
               </label>
               <input
@@ -142,15 +136,13 @@ function Asistencia() {
                 className="form-control"
                 value={presencial}
                 onChange={(e) => setPresencial(e.target.value)}
-                style={{ flexGrow: 1 }}
               />
             </div>
           </div>
 
-          <div className="mb-4 row justify-content-center align-items-center">
-            <div className="col-12 col-md-8 d-flex align-items-center">
-              <i className="fas fa-video fa-lg me-2"></i>
-              <label htmlFor="zoom" className="form-label fw-bold me-2 mb-0">
+          <div className="mb-4 row justify-content-center">
+            <div className="col-12">
+              <label htmlFor="zoom" className="form-label fw-bold">
                 Zoom
               </label>
               <input
@@ -159,15 +151,13 @@ function Asistencia() {
                 className="form-control"
                 value={zoom}
                 onChange={(e) => setZoom(e.target.value)}
-                style={{ flexGrow: 1 }}
               />
             </div>
           </div>
 
-          <div className="mb-4 row justify-content-center align-items-center">
-            <div className="col-12 col-md-8 d-flex align-items-center">
-              <i className="fab fa-youtube fa-lg me-2"></i>
-              <label htmlFor="youtube" className="form-label fw-bold me-2 mb-0">
+          <div className="mb-4 row justify-content-center">
+            <div className="col-12">
+              <label htmlFor="youtube" className="form-label fw-bold">
                 YouTube
               </label>
               <input
@@ -176,24 +166,21 @@ function Asistencia() {
                 className="form-control"
                 value={youtube}
                 onChange={(e) => setYoutube(e.target.value)}
-                style={{ flexGrow: 1 }}
               />
             </div>
           </div>
 
-          <div className="mb-4 row justify-content-center align-items-center">
-            <div className="col-12 col-md-8 d-flex align-items-center">
-              <i className="fas fa-sticky-note fa-lg me-2"></i>
-              <label htmlFor="notas" className="form-label fw-bold me-2 mb-0">
+          <div className="mb-4 row justify-content-center">
+            <div className="col-12">
+              <label htmlFor="notas" className="form-label fw-bold">
                 Notas
               </label>
-              <input
-                type="text"
+              <textarea
                 id="notas"
                 className="form-control"
+                rows="4" // Ajusta la cantidad de filas según lo necesites
                 value={notas}
                 onChange={(e) => setNotas(e.target.value)}
-                style={{ flexGrow: 1 }}
               />
             </div>
           </div>
@@ -210,8 +197,9 @@ function Asistencia() {
         </form>
 
         <h3 className="mb-2 text-center">Historial</h3>
-        <div className="table-container">
-          <table className="table table-striped table-bordered w-75 mx-auto">
+
+        <div className="table-responsive">
+          <table className="table table-striped table-bordered w-100 mx-auto">
             <thead>
               <tr className="text-center">
                 <th>Fecha</th>
@@ -219,34 +207,50 @@ function Asistencia() {
                 <th>Zoom</th>
                 <th>YouTube</th>
                 <th>Total</th>
-                <th>Notas</th> {/* Add Notas column */}
+                <th>Notas</th>
                 <th></th>
               </tr>
             </thead>
             <tbody className="text-center">
-  {historial.map((entry) => (
-    <tr key={entry.id}>
-      <td>{new Date(entry.date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
-      <td>{entry.presencial}</td>
-      <td>{entry.zoom}</td>
-      <td>{entry.youtube}</td>
-      <td>{entry.total}</td>
-      <td>{entry.notas}</td>
-      <td>
-        <button
-          className="btn btn-danger"
-          onClick={() => {
-            setDeleteId(entry.id);
-            setShowDeleteModal(true);
-          }}
-        >
-          <i className="fas fa-trash-alt"></i>
-        </button>
-      </td>
-    </tr>
-  ))}
-</tbody>
+              {historial.map((entry) => {
+                const duplicate =
+                  historial.filter((e) => e.date === entry.date).length > 1;
+                return (
+                  <tr
+                    key={entry.id}
+                    style={duplicate ? { backgroundColor: "IndianRed" } : {}}
+                  >
+                    <td>
+                      {new Date(
+                        new Date(entry.date).getTime() +
+                          new Date(entry.date).getTimezoneOffset() * 60000
+                      ).toLocaleDateString("es-ES", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })}
+                    </td>
 
+                    <td>{entry.presencial}</td>
+                    <td>{entry.zoom}</td>
+                    <td>{entry.youtube}</td>
+                    <td>{entry.total}</td>
+                    <td>{entry.notas}</td>
+                    <td>
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => {
+                          setDeleteId(entry.id);
+                          setShowDeleteModal(true);
+                        }}
+                      >
+                        <i className="fas fa-trash-alt"></i>
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
           </table>
         </div>
 
